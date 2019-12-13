@@ -1,7 +1,7 @@
 import operator
 import sys
 from collections import defaultdict
-from math import asin, degrees, sqrt
+from math import asin, degrees, fabs, sqrt
 
 import numpy as np
 
@@ -32,48 +32,46 @@ def distance(a, b):
 
 
 def get_quadrant(a, b):
-    run = a[0] - b[0]
+    run = b[0] - a[0]
     rise = a[1] - b[1]
 
     if run > 0 and rise > 0:
         return 1
-    elif run < 0 and rise > 0:
+    if run < 0 and rise > 0:
         return 2
-    elif run < 0 and rise < 0:
+    if run < 0 and rise < 0:
         return 3
-    elif run > 0 and rise < 0:
+    if run > 0 and rise < 0:
         return 4
-    elif run > 0 and rise == 0:
+    if run > 0 and rise == 0:
         return 5
-    elif run < 0 and rise == 0:
+    if run < 0 and rise == 0:
         return 6
-    elif run == 0 and rise < 0:
+    if run == 0 and rise < 0:
         return 7
-    else:
-        return 8
-
+    return 8
 
 
 def get_relative_angle(a, b):
-    run = a[0] - b[0]
+    run = b[0] - a[0]
     rise = a[1] - b[1]
-    opposite = b[0]
+    opposite = fabs(run)
     hypotenus = distance(a, b)
 
     if run > 0 and rise > 0:
         return degrees(asin(opposite / hypotenus))
     elif run < 0 and rise > 0:
-        return 270 + degrees(asin(-1 * opposite / hypotenus))
+        return 270 + degrees(asin(opposite / hypotenus))
     elif run < 0 and rise < 0:
         return 180 + degrees(asin(opposite / hypotenus))
     elif run > 0 and rise < 0:
-        return 90 + degrees(asin(-1 * opposite / hypotenus))
+        return 90 + degrees(asin(opposite / hypotenus))
     elif run > 0 and rise == 0:
-        return 90 
+        return 90
     elif run < 0 and rise == 0:
-        return 270 
+        return 270
     elif run == 0 and rise < 0:
-        return 180
+        return 0
     else:
         return 0
 
@@ -106,5 +104,26 @@ base_location = sorted(visible.items(), key=operator.itemgetter(1), reverse=True
 print(base_location)
 
 # for each asteroid, order based on relative slope / quad, then by dist to base
+relative_angles = defaultdict(list)
 for asteroid in asteroid_locations:
-    pass
+    if asteroid == base_location:
+        continue
+    relative_angles[get_relative_angle(base_location, asteroid)].append((asteroid,
+        distance(asteroid, base_location)))
+ordered_angles = sorted(list(relative_angles.keys()))
+
+
+for angle in ordered_angles:
+    relative_angles[angle] = sorted(relative_angles[angle], key=operator.itemgetter(1))
+
+
+i = 0
+for angle in ordered_angles:
+    try:
+        potential = relative_angles[angle].pop(0)
+    except IndexError:
+        continue
+    print(i, ':', potential[0])
+    i += 1
+    if i > 205:
+        break
