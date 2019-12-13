@@ -1,6 +1,6 @@
 import sys
 from collections import defaultdict
-from math import fabs
+from math import gcd
 
 
 class Moon:
@@ -23,30 +23,21 @@ class Moon:
         self.y_pos += self.y_vel
         self.z_pos += self.z_vel
 
-    def happened_before(self, axis):
+    def back_to_start(self, axis):
         if axis == 0:
-            if self.x_pos in self.history[0]:
-                return True
-            else:
-                self.history[0].append(self.x_pos)
+            if self.x_pos != self.original_x:
                 return False
-
+            return True
         if axis == 1:
-            if self.y_pos in self.history[1]:
-                return True
-            else:
-                self.history[1].append(self.y_pos)
+            if self.y_pos != self.original_y:
                 return False
-
+            return True
         if axis == 2:
-            if self.z_pos in self.history[2]:
-                return True
-            else:
-                self.history[2].append(self.z_pos)
+            if self.z_pos != self.original_z:
                 return False
-
-        print('what the fuck')
-        sys.exit()
+            return True
+        print('should not get here')
+        return False
 
     def apply_gravity(self, other_moon):
         if self.x_pos > other_moon.x_pos:
@@ -107,25 +98,28 @@ while not done:
             moon1.apply_gravity(moon2)
         completed.append(moon1)
     done = True
-    for index, moon in enumerate(moons):
+    for moon in moons:
         moon.apply_velocity()
-        for axis in (0, 1, 2):
-            if '{0}{1}'.format(index, axis) not in num_cycles.keys() and moon.happened_before(axis):
-                print('*******GOT ONE*********')
-                num_cycles['{0}{1}'.format(index, axis)] = t
-            else:
+    for axis in (0, 1, 2):
+        all_lined_up = True
+        if axis in num_cycles:
+            continue
+        for moon in moons:
+            if not moon.back_to_start(axis):
+                all_lined_up = False
                 done = False
-    if len(num_cycles) == 12:
+                break
+        if all_lined_up:
+            print('*******GOT ONE*********')
+            num_cycles[axis] = t + 2
+    if len(num_cycles) == 3:
         done = True
-        print(num_cycles)
     t += 1
 
+print('num cycles', num_cycles)
 print('took this many iterations', t)
 
-print('After {0} steps'.format(t))
-for moon in moons:
-    print(moon)
-
-energy = sum([(fabs(m.x_pos) + fabs(m.y_pos) + fabs(m.z_pos)) *
-              (fabs(m.x_vel) + fabs(m.y_vel) + fabs(m.z_vel)) for m in moons])
-print(energy)
+total_cycles = num_cycles[0]
+total_cycles *= num_cycles[1] / gcd(total_cycles, num_cycles[1])
+total_cycles *= num_cycles[2] / gcd(int(total_cycles), num_cycles[2])
+print(total_cycles)
