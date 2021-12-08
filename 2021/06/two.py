@@ -12,8 +12,8 @@ print(population)
 for day in range(days):
     population.append(0)
     born = population.pop(0)
-    population[6] += born # fish that gave birth
-    population[8] += born # fish that were born
+    population[6] += born # mama fish
+    population[8] += born # baby fish
     print(population)
 
 print(sum(population))
