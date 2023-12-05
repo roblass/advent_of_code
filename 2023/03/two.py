@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# THIS DOES NOT PASS
-
 # 64012079 is too low
 # 84233757 is too low
 
@@ -30,7 +28,7 @@ def main(filename):
             # number before it?
             i = char_index
             adj_num = ""
-            while i > 0 and line[i - 1].isdigit():
+            while i >= 0 and line[i - 1].isdigit():
                 adj_num += line[i - 1]
                 i -= 1
             if adj_num:
@@ -44,7 +42,7 @@ def main(filename):
                 adj_num += line[i + 1]
                 i += 1
             if adj_num:
-                adjacent_numbers.append(int(adj_num[::-1]))
+                adjacent_numbers.append(int(adj_num))
 
             # number(s) above it?
             if line_index > 0:
@@ -64,6 +62,7 @@ def main(filename):
 
             if len(adjacent_numbers) == 2:
                 gear_ratio_sums += adjacent_numbers[0] * adjacent_numbers[1]
+
     print(gear_ratio_sums)
 
 
