@@ -22,7 +22,6 @@ class Parser:
     def is_expected(self, t):
         if self.in_mul:
             self.so_far += t
-            #print(f"\t so_far = {self.so_far}")
             if self.so_far in ("mu", "mul"):
                 return True
             if self.so_far in ("mul("):
@@ -56,14 +55,12 @@ class Parser:
             if self.so_far in ("do", "do("):
                 return True
             if self.so_far in ("do()"):
-                print("enabling multiplication")
                 self.enable_mul = True
                 self.reset()
                 return False # technically it is expected, but roll with this design choice please
             if self.so_far in ("don", "don'", "don't", "don't("):
                 return True
             if self.so_far in ("don't()"):
-                print("disabling multiplication")
                 self.enable_mul = False
                 self.reset()
                 return False # see comment above
@@ -86,9 +83,7 @@ class Parser:
 
     def add_token(self, t):
         is_expected = self.is_expected(t)
-        #print(f"Got token {t} and is_expected = {is_expected}")
         if is_expected and self.so_far.endswith(")"):
-            print(f"need to evaluate {self.so_far}")
             result = self.evaluate()
             self.reset()
             return result

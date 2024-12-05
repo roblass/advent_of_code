@@ -18,7 +18,6 @@ class Parser:
     def is_expected(self, t):
         if self.in_mul:
             self.so_far += t
-            #print(f"\t so_far = {self.so_far}")
             if self.so_far in ("mu", "mul"):
                 return True
             if self.so_far in ("mul("):
@@ -59,9 +58,7 @@ class Parser:
 
     def add_token(self, t):
         is_expected = self.is_expected(t)
-        #print(f"Got token {t} and is_expected = {is_expected}")
         if is_expected and self.so_far.endswith(")"):
-            print(f"need to evaluate {self.so_far}")
             result = self.evaluate()
             self.reset()
             return result
